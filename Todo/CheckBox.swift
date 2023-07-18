@@ -2,35 +2,50 @@
 //  CheckBox.swift
 //  Todo
 //
-//  Created by 村上太一 on 2023/07/13.
+//  Created by user.name on 2020/05/12.
+//  Copyright © 2020 example.com. All rights reserved.
 //
 
 import SwiftUI
 
-struct CheckBox: View {
-    // 変数を別ビューに渡す場合は変数に@stateを指定する
-    // @State var checked: Bool = false
-    // 変数を他のビューから値を受け取れるようにするには@Bindingを指定する
+struct CheckBox<Label>: View where Label: View{
     @Binding var checked: Bool
+    
+    private var label: ()-> Label
+    
+    public init(checked: Binding<Bool>,
+                @ViewBuilder label: @escaping ()-> Label) {
+        self._checked = checked
+        self.label = label
+    }
+
+    
     var body: some View {
-        // Toggleは別ビュー
-//        Toggle(isOn: $checked) {
-//            Text("チェックボックス")
-//        }
-        Image(systemName: checked ? "checkmark.circle":"circle")
-            .onTapGesture {
-                self.checked.toggle()
+        HStack {
+            Image(systemName: checked ? "checkmark.circle" : "circle")
+                .onTapGesture {
+                    self.checked.toggle()
             }
+            label()
+        }
     }
 }
 
-// キャンバスでのプレビューテスト用のコード
-// プログラムの実行には関係ない
 struct CheckBox_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
-            CheckBox(checked: .constant(false))
-            CheckBox(checked: .constant(true))
+            CheckBox(checked: .constant(false)) {
+                Text("牛乳を買う")
+            }
+            CheckBox(checked: .constant(true)) {
+                Image(systemName: "hand.thumbsup")
+            }
+            CheckBox(checked: .constant(true)) {
+                Image(systemName: "hand.thumbsup")
+                Text("牛乳を買う")
+                Text("牛乳を買う")
+            }
+            
         }
     }
 }
